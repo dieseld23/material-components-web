@@ -74,7 +74,7 @@ We’re going to use `webpack-dev-server` to demonstrate how webpack bundles our
 ```json
 {
   "scripts": {
-    "start": "webpack-dev-server"
+    "start": "webpack serve"
   }
 }
 ```
@@ -229,12 +229,16 @@ Then add `postcss-loader`, using `autoprefixer` as a plugin:
 ```js
 { loader: 'extract-loader' },
 { loader: 'css-loader' },
-{
-  loader: 'postcss-loader',
-  options: {
-     plugins: () => [autoprefixer()]
-  }
-},
+  {
+    loader: 'postcss-loader',
+    options: {
+      postcssOptions: {
+        plugins: [
+          require('autoprefixer')
+        ]
+      }
+    } 
+  },
 {
   loader: 'sass-loader',
   options: {
@@ -317,8 +321,6 @@ Then configure webpack to convert `app.js` into `bundle.js` by modifying the fol
 The final `webpack.config.js` file should look like this:
 
 ```js
-const autoprefixer = require('autoprefixer');
-
 module.exports = {
   entry: ['./app.scss', './app.js'],
   output: {
@@ -337,12 +339,7 @@ module.exports = {
           },
           {loader: 'extract-loader'},
           {loader: 'css-loader'},
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: () => [autoprefixer()]
-            }
-          },
+          {loader: 'postcss-loader'},
           {
             loader: 'sass-loader',
             options: {
@@ -404,7 +401,7 @@ Add another script to `package.json`:
 ```json
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server"
+    "start": "webpack serve"
   }
 ```
 
@@ -460,10 +457,18 @@ function materialImporter(url, prev) {
 Then update your `sass-loader` config to the following:
 
 ```js
-{
-  loader: 'sass-loader',
-  options: {
-    importer: materialImporter
-  },
-}
+ {
+   loader: 'sass-loader',
+   options: {   
+     // Prefer Dart Sass
+     implementation: require('sass'),
+
+     // See https://github.com/webpack-contrib/sass-loader/issues/804
+     webpackImporter: false,
+     sassOptions: {
+       importer: materialImporter,
+       includePaths: ['./node_modules'],
+     },
+   },
+ }
 ```
