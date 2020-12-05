@@ -234,7 +234,7 @@ Then add `postcss-loader`, using `autoprefixer` as a plugin:
     options: {
       postcssOptions: {
         plugins: [
-          require('autoprefixer')
+          autoprefixer()
         ]
       }
     } 
